@@ -3,7 +3,10 @@ from pathlib import Path
 from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+from flask_pymongo import PyMongo
 
+# Initialize MongoDB connection
+mongo = PyMongo()
 
 load_dotenv()
 
@@ -29,6 +32,11 @@ def create_app(config_overrides: dict | None = None) -> Flask:
 
     if config_overrides:
         app.config.update(config_overrides)
+
+    # MongoDB configuration
+    app.config["MONGO_URI"] = os.getenv("MONGODB_URI", "mongodb://localhost:27017/lostfound")
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "your-secret-key-here")
+    mongo.init_app(app)
 
     # CORS for Vite dev server
     frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
