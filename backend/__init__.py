@@ -38,9 +38,24 @@ def create_app(config_overrides: dict | None = None) -> Flask:
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "your-secret-key-here")
     mongo.init_app(app)
 
-    # CORS for Vite dev server
-    frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
-    CORS(app, resources={r"/api/*": {"origins": [frontend_origin]}})
+    # Ensure DB indexes on startup
+    with app.app_context():
+        try:
+            from .models.models import ensure_indexes
+            ensure_indexes()
+        except Exception as exc:  # pragma: no cover
+            # Avoid hard-failing app if index creation encounters a transient error
+            app.logger.warning(f"Index creation warning: {exc}")
+
+    # CORS for Vite dev server - allow both 5173 and 5174 ports in development
+    frontend_origins = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+    ]
+    # Remove any duplicates and None values
+    frontend_origins = list({origin for origin in frontend_origins if origin})
+    CORS(app, resources={"/api/*": {"origins": frontend_origins}})
 
     # Register blueprints
     from .routes.api import api_bp  # noqa: WPS433 (import within function)

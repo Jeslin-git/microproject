@@ -27,7 +27,6 @@ export const authService = {
     }
     return response.data;
   },
-
   logout: () => {
     localStorage.removeItem('token');
   }
@@ -49,8 +48,63 @@ export const itemsService = {
     return response.data;
   },
 
+  searchFoundItems: async (query, filters = {}) => {
+    const params = new URLSearchParams({ q: query, ...filters });
+    const response = await axios.get(`${API_URL}/found-items/search?${params}`);
+    return response.data;
+  },
+
+  searchLostItems: async (query, filters = {}) => {
+    const params = new URLSearchParams({ q: query, ...filters });
+    const response = await axios.get(`${API_URL}/lost-items/search?${params}`);
+    return response.data;
+  },
+
+  getMatches: async (lostItemId) => {
+    const response = await axios.get(`${API_URL}/lost-items/${lostItemId}/matches`);
+    return response.data;
+  },
+
+  createClaim: async (lostItemId, foundItemId) => {
+    const response = await axios.post(`${API_URL}/claims`, {
+      lost_item_id: lostItemId,
+      found_item_id: foundItemId
+    });
+    return response.data;
+  },
+
   verifyClaim: async (claimId) => {
     const response = await axios.post(`${API_URL}/claims/${claimId}/verify`);
+    return response.data;
+  }
+};
+
+export const adminService = {
+  getClaims: async () => {
+    const response = await axios.get(`${API_URL}/admin/claims`);
+    return response.data;
+  },
+
+  approveClaim: async (claimId) => {
+    const response = await axios.post(`${API_URL}/admin/claims/${claimId}/approve`);
+    return response.data;
+  },
+
+  rejectClaim: async (claimId) => {
+    const response = await axios.post(`${API_URL}/admin/claims/${claimId}/reject`);
+    return response.data;
+  },
+
+  createRetrieval: async (claimId, notes) => {
+    const response = await axios.post(`${API_URL}/admin/retrievals`, {
+      claim_id: claimId,
+      notes
+    });
+    return response.data;
+  },
+
+  getRetrievals: async () => {
+    const response = await axios.get(`${API_URL}/admin/retrievals`);
     return response.data;
   }
 };

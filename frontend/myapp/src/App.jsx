@@ -11,6 +11,9 @@ import Login from './components/Login';
 import LostItemForm from './components/LostItemForm';
 import FoundItemForm from './components/FoundItemForm';
 import ItemCard from './components/ItemCard';
+import SearchFoundItems from './components/SearchFoundItems';
+import ItemMatches from './components/ItemMatches';
+import AdminDashboard from './components/AdminDashboard';
 
 // Services
 import { authService, itemsService } from './services/api';
@@ -31,6 +34,7 @@ function App() {
     !!localStorage.getItem('token')
   );
   const [lostItems, setLostItems] = useState([]);
+  const [selectedLostItem, setSelectedLostItem] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -96,6 +100,12 @@ function App() {
                   <Button color="inherit" component={Link} to="/found">
                     Report Found
                   </Button>
+                  <Button color="inherit" component={Link} to="/search">
+                    Search
+                  </Button>
+                  <Button color="inherit" component={Link} to="/admin">
+                    Admin
+                  </Button>
                   <Button color="inherit" onClick={handleLogout}>
                     Logout
                   </Button>
@@ -131,7 +141,25 @@ function App() {
                           Your Lost Items
                         </Typography>
                         {lostItems.map((item) => (
-                          <ItemCard key={item.id} item={item} type="lost" />
+                          <Box key={item.id}>
+                            <ItemCard item={item} type="lost" />
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => setSelectedLostItem(item)}
+                              sx={{ mt: 1, mb: 2 }}
+                            >
+                              View Potential Matches
+                            </Button>
+                            {selectedLostItem?.id === item.id && (
+                              <Box sx={{ mt: 2, mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                                <ItemMatches 
+                                  lostItemId={item.id} 
+                                  lostItemTitle={item.title}
+                                />
+                              </Box>
+                            )}
+                          </Box>
                         ))}
                       </Box>
                     </>
@@ -145,6 +173,26 @@ function App() {
                 element={
                   isAuthenticated ? (
                     <FoundItemForm onSubmit={handleFoundItemSubmit} />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  isAuthenticated ? (
+                    <SearchFoundItems />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  isAuthenticated ? (
+                    <AdminDashboard />
                   ) : (
                     <Navigate to="/login" />
                   )
