@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
   Grid,
   CircularProgress,
-  Chip,
   Alert,
-  Snackbar
+  Snackbar,
+  Paper
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { itemsService } from '../services/api';
+import ItemCard from './ItemCard';
 
-function ItemMatches({ lostItemId, lostItemTitle }) {
+export default function ItemMatches({ lostItemId, lostItemTitle }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -68,55 +67,33 @@ function ItemMatches({ lostItemId, lostItemTitle }) {
   }
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
+    <Paper sx={{ p: 3, mt: 2 }}>
+      <Typography variant="h6" gutterBottom>
         Potential Matches for "{lostItemTitle}"
       </Typography>
       
       {matches.length === 0 ? (
         <Alert severity="info" sx={{ mt: 2 }}>
-          No potential matches found yet. We'll notify you when someone reports a matching item.
+          No potential matches found at this time. The system will continue to search for your item.
         </Alert>
       ) : (
-        <>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Found {matches.length} potential {matches.length === 1 ? 'match' : 'matches'}
-          </Typography>
-          
-          <Grid container spacing={2}>
-            {matches.map((item) => (
-              <Grid item xs={12} md={6} key={item.id}>
-                <Card sx={{ border: '2px solid', borderColor: 'primary.light' }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {item.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      {item.description}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
-                      <Chip label={item.category} size="small" color="primary" />
-                      <Chip label={item.location} size="small" />
-                      <Chip label={item.status} size="small" color="secondary" />
-                    </Box>
-                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
-                      Passkey: {item.passkey}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<CheckCircleIcon />}
-                      onClick={() => handleCreateClaim(item.id)}
-                      fullWidth
-                    >
-                      Claim This Item
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </>
+        <Grid container spacing={3}>
+          {matches.map((item) => (
+            <Grid item xs={12} sm={6} key={item.id}>
+              <ItemCard item={item} type="found" />
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<CheckCircleIcon />}
+                onClick={() => handleCreateClaim(item.id)}
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                This is my item!
+              </Button>
+            </Grid>
+          ))}
+        </Grid>
       )}
 
       <Snackbar
@@ -129,8 +106,7 @@ function ItemMatches({ lostItemId, lostItemTitle }) {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Paper>
   );
 }
 
-export default ItemMatches;

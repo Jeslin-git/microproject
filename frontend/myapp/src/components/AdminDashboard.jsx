@@ -15,14 +15,16 @@ import {
   TextField,
   Tabs,
   Tab,
-  Alert
+  Alert,
+  Paper
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import { adminService } from '../services/api';
+import Hero from './Hero';
 
-function AdminDashboard() {
+export default function AdminDashboard() {
   const [tab, setTab] = useState(0);
   const [claims, setClaims] = useState([]);
   const [retrievals, setRetrievals] = useState([]);
@@ -101,159 +103,123 @@ function AdminDashboard() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Admin Dashboard
-      </Typography>
+      <Hero 
+        title="Admin Dashboard"
+        subtitle="Manage claims and view retrieval history from here."
+      />
+      <Paper sx={{ p: 3 }}>
+        <Tabs value={tab} onChange={(e, newValue) => setTab(newValue)} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}>
+          <Tab label="Claims Management" />
+          <Tab label="Retrieval History" />
+        </Tabs>
 
-      <Tabs value={tab} onChange={(e, newValue) => setTab(newValue)} sx={{ mb: 3 }}>
-        <Tab label="Claims Management" />
-        <Tab label="Retrieval History" />
-      </Tabs>
-
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
-          {tab === 0 && (
-            <Grid container spacing={2}>
-              {claims.length === 0 ? (
-                <Grid item xs={12}>
-                  <Alert severity="info">No claims to review</Alert>
-                </Grid>
-              ) : (
-                claims.map((claim) => (
-                  <Grid item xs={12} md={6} key={claim.id}>
-                    <Card>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                          <Typography variant="h6">Claim #{claim.id.slice(-6)}</Typography>
-                          <Chip 
-                            label={claim.status} 
-                            size="small" 
-                            color={getStatusColor(claim.status)}
-                          />
-                        </Box>
-                        <Typography variant="body2" color="text.secondary">
-                          Student: {claim.student_id}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Lost Item: {claim.lost_item_id}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                          Found Item: {claim.found_item_id}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Created: {new Date(claim.created_at).toLocaleString()}
-                        </Typography>
-                        
-                        {claim.status === 'pending' && (
-                          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                            <Button
-                              variant="contained"
-                              color="success"
-                              size="small"
-                              startIcon={<CheckIcon />}
-                              onClick={() => handleApproveClaim(claim.id)}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              color="error"
-                              size="small"
-                              startIcon={<CloseIcon />}
-                              onClick={() => handleRejectClaim(claim.id)}
-                            >
-                              Reject
-                            </Button>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Box>
+            {tab === 0 && (
+              <Grid container spacing={3}>
+                {claims.length === 0 ? (
+                  <Grid item xs={12}>
+                    <Alert severity="info">There are no pending claims to review.</Alert>
+                  </Grid>
+                ) : (
+                  claims.map((claim) => (
+                    <Grid item xs={12} sm={6} md={4} key={claim.id}>
+                      <Card>
+                        <CardContent>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6">Claim #{claim.id.slice(-6)}</Typography>
+                            <Chip 
+                              label={claim.status} 
+                              size="small" 
+                              color={getStatusColor(claim.status)}
+                            />
                           </Box>
-                        )}
-                        
-                        {claim.status === 'approved' && (
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            startIcon={<InventoryIcon />}
-                            onClick={() => handleOpenRetrievalDialog(claim.id)}
-                            sx={{ mt: 2 }}
-                          >
-                            Record Retrieval
-                          </Button>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))
-              )}
-            </Grid>
-          )}
+                          <Typography variant="body2" color="text.secondary">User ID: {claim.student_id}</Typography>
+                          <Typography variant="body2" color="text.secondary">Lost Item ID: {claim.lost_item_id}</Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Found Item ID: {claim.found_item_id}</Typography>
+                          <Typography variant="caption" color="text.secondary">Claimed on: {new Date(claim.created_at).toLocaleDateString()}</Typography>
+                          
+                          {claim.status === 'pending' && (
+                            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                              <Button variant="contained" color="success" size="small" startIcon={<CheckIcon />} onClick={() => handleApproveClaim(claim.id)}>
+                                Approve
+                              </Button>
+                              <Button variant="outlined" color="error" size="small" startIcon={<CloseIcon />} onClick={() => handleRejectClaim(claim.id)}>
+                                Reject
+                              </Button>
+                            </Box>
+                          )}
+                          
+                          {claim.status === 'approved' && (
+                            <Button variant="contained" color="info" size="small" startIcon={<InventoryIcon />} onClick={() => handleOpenRetrievalDialog(claim.id)} sx={{ mt: 2 }}>
+                              Log Retrieval
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))
+                )}
+              </Grid>
+            )}
 
-          {tab === 1 && (
-            <Grid container spacing={2}>
-              {retrievals.length === 0 ? (
-                <Grid item xs={12}>
-                  <Alert severity="info">No retrievals recorded yet</Alert>
-                </Grid>
-              ) : (
-                retrievals.map((retrieval) => (
-                  <Grid item xs={12} md={6} key={retrieval.id}>
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h6" gutterBottom>
-                          Retrieval #{retrieval.id.slice(-6)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Claim: {retrieval.claim_id}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Retrieved by: {retrieval.retrieved_by}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Date: {new Date(retrieval.retrieved_at).toLocaleString()}
-                        </Typography>
-                        {retrieval.notes && (
-                          <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
-                            Notes: {retrieval.notes}
-                          </Typography>
-                        )}
-                      </CardContent>
-                    </Card>
+            {tab === 1 && (
+              <Grid container spacing={3}>
+                {retrievals.length === 0 ? (
+                  <Grid item xs={12}>
+                    <Alert severity="info">No items have been retrieved yet.</Alert>
                   </Grid>
-                ))
-              )}
-            </Grid>
-          )}
-        </>
-      )}
+                ) : (
+                  retrievals.map((retrieval) => (
+                    <Grid item xs={12} sm={6} md={4} key={retrieval.id}>
+                      <Card>
+                        <CardContent>
+                          <Typography variant="h6" gutterBottom>Retrieval #{retrieval.id.slice(-6)}</Typography>
+                          <Typography variant="body2" color="text.secondary">Claim ID: {retrieval.claim_id}</Typography>
+                          <Typography variant="body2" color="text.secondary">Retrieved by User: {retrieval.retrieved_by}</Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>Date: {new Date(retrieval.retrieved_at).toLocaleString()}</Typography>
+                          {retrieval.notes && (
+                            <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>Notes: {retrieval.notes}</Typography>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))
+                )}
+              </Grid>
+            )}
+          </Box>
+        )}
 
-      <Dialog open={retrievalDialog.open} onClose={handleCloseRetrievalDialog}>
-        <DialogTitle>Record Item Retrieval</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Notes (optional)"
-            type="text"
-            fullWidth
-            multiline
-            rows={3}
-            value={retrievalNotes}
-            onChange={(e) => setRetrievalNotes(e.target.value)}
-            placeholder="Add any notes about the retrieval..."
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseRetrievalDialog}>Cancel</Button>
-          <Button onClick={handleRecordRetrieval} variant="contained">
-            Record Retrieval
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={retrievalDialog.open} onClose={handleCloseRetrievalDialog} fullWidth maxWidth="sm">
+          <DialogTitle>Log Item Retrieval</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Retrieval Notes (Optional)"
+              type="text"
+              fullWidth
+              multiline
+              rows={4}
+              value={retrievalNotes}
+              onChange={(e) => setRetrievalNotes(e.target.value)}
+              placeholder="Enter any notes about the item retrieval process..."
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: '16px 24px' }}>
+            <Button onClick={handleCloseRetrievalDialog}>Cancel</Button>
+            <Button onClick={handleRecordRetrieval} variant="contained" color="primary">
+              Confirm Retrieval
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Paper>
     </Box>
   );
 }
 
-export default AdminDashboard;
