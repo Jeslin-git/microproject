@@ -3,17 +3,18 @@ import {
   Box,
   TextField,
   Button,
-  Card,
-  CardContent,
   Typography,
   Grid,
   CircularProgress,
-  Chip
+  Paper,
+  InputAdornment
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { itemsService } from '../services/api';
+import ItemCard from './ItemCard';
+import Hero from './Hero';
 
-function SearchFoundItems() {
+export default function SearchFoundItems() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -38,83 +39,69 @@ function SearchFoundItems() {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Search Found Items
-      </Typography>
-      
-      <Box component="form" onSubmit={handleSearch} sx={{ mb: 4 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={9}>
-            <TextField
-              fullWidth
-              label="Search by keywords"
-              placeholder="e.g., blue backpack, laptop, keys"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              variant="outlined"
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Button
-              fullWidth
-              variant="contained"
-              type="submit"
-              startIcon={<SearchIcon />}
-              disabled={loading || !query.trim()}
-              sx={{ height: '56px' }}
-            >
-              Search
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
+      <Hero 
+        title="Search for Items"
+        subtitle="Use the search bar below to find items that have been reported as found."
+      />
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Find a Found Item
+        </Typography>
+        
+        <Box component="form" onSubmit={handleSearch} sx={{ mb: 4 }}>
+          <TextField
+            fullWidth
+            label="Search by keywords, category, or location"
+            placeholder="e.g., red wallet, phone, library"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    disabled={loading || !query.trim()}
+                    startIcon={<SearchIcon />}
+                  >
+                    Search
+                  </Button>
+                </InputAdornment>
+              ),
+            }}
+          />
         </Box>
-      )}
 
-      {!loading && searched && (
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            {results.length} {results.length === 1 ? 'result' : 'results'} found
-          </Typography>
-          
-          <Grid container spacing={2}>
-            {results.map((item) => (
-              <Grid item xs={12} md={6} key={item.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {item.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" paragraph>
-                      {item.description}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-                      <Chip label={item.category} size="small" color="primary" />
-                      <Chip label={item.location} size="small" />
-                      <Chip label={item.status} size="small" color="secondary" />
-                    </Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Passkey: {item.passkey}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
+          </Box>
+        )}
 
-          {results.length === 0 && (
-            <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-              No items found matching your search. Try different keywords.
+        {!loading && searched && (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {results.length} {results.length === 1 ? 'Result' : 'Results'}
             </Typography>
-          )}
-        </Box>
-      )}
+            
+            <Grid container spacing={3}>
+              {results.map((item) => (
+                <Grid item xs={12} sm={6} md={4} key={item.id}>
+                  <ItemCard item={item} type="found" />
+                </Grid>
+              ))}
+            </Grid>
+
+            {results.length === 0 && (
+              <Typography variant="body1" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                No items found matching your search criteria.
+              </Typography>
+            )}
+          </Box>
+        )}
+      </Paper>
     </Box>
   );
 }
 
-export default SearchFoundItems;
