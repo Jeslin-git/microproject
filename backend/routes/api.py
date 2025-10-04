@@ -30,9 +30,13 @@ def register():
     password_hash = generate_password_hash(data["password"])
     student = Student.create(data["email"], data["name"], password_hash)
     
+    # Get the created student to get the role
+    created_student = Student.find_by_id(str(student.inserted_id))
+    role = created_student.get('role', 'student')
+    
     return jsonify({
         "message": "Registration successful",
-        "token": create_token(str(student.inserted_id))
+        "token": create_token(str(student.inserted_id), role)
     }), 201
 
 @api_bp.post("/auth/login")
@@ -43,8 +47,10 @@ def login():
     if not student or not check_password_hash(student["password"], data["password"]):
         return jsonify({"message": "Invalid credentials"}), 401
     
+    role = student.get('role', 'student')
+    
     return jsonify({
-        "token": create_token(str(student["_id"]))
+        "token": create_token(str(student["_id"]), role)
     })
 
 # Lost Items routes

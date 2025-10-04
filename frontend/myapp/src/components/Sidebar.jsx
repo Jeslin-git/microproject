@@ -8,6 +8,7 @@ import {
   Search as SearchIcon,
   AdminPanelSettings as AdminPanelSettingsIcon,
 } from '@mui/icons-material';
+import { authService } from '../services/api';
 
 const drawerWidth = 240;
 
@@ -34,6 +35,14 @@ const menuItems = [
 ];
 
 const Sidebar = () => {
+  const isUserAdmin = authService.isAdmin();
+  const filteredMenuItems = menuItems.filter(item => {
+    if (item.path === '/admin') {
+      return isUserAdmin;
+    }
+    return true;
+  });
+
   return (
     <Drawer
       variant="permanent"
@@ -49,7 +58,7 @@ const Sidebar = () => {
     >
       <Toolbar />
       <List>
-        {menuItems.map((item) => (
+        {filteredMenuItems.map((item) => (
           <StyledListItem key={item.text} component={NavLink} to={item.path}>
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText primary={item.text} />

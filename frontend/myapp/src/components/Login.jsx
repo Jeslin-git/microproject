@@ -81,7 +81,13 @@ export default function Login({ onLogin }) {
       bgcolor: 'background.default' 
     }}>
       <Container maxWidth="xs">
-        <Card raised sx={{ p: 2 }}>
+        <Card raised sx={{ 
+          p: 3, 
+          borderRadius: 4,
+          boxShadow: '0 16px 48px rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
           <CardContent>
             <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 3 }}>
               Lost & Found
@@ -104,24 +110,36 @@ export default function Login({ onLogin }) {
                   fullWidth
                   id="login-email"
                   name="email"
-                  label="Email"
+                  label="Email Address"
+                  placeholder="Enter your email"
                   margin="normal"
                   value={loginFormik.values.email}
                   onChange={loginFormik.handleChange}
                   error={loginFormik.touched.email && Boolean(loginFormik.errors.email)}
                   helperText={loginFormik.touched.email && loginFormik.errors.email}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
                 <TextField
                   fullWidth
                   id="login-password"
                   name="password"
                   label="Password"
+                  placeholder="Enter your password"
                   type="password"
                   margin="normal"
                   value={loginFormik.values.password}
                   onChange={loginFormik.handleChange}
                   error={loginFormik.touched.password && Boolean(loginFormik.errors.password)}
                   helperText={loginFormik.touched.password && loginFormik.errors.password}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
                 <Button
                   color="primary"
@@ -129,9 +147,22 @@ export default function Login({ onLogin }) {
                   fullWidth
                   type="submit"
                   disabled={loading}
-                  sx={{ mt: 3, py: 1.5 }}
+                  size="large"
+                  sx={{ 
+                    mt: 3, 
+                    py: 2,
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    textTransform: 'none',
+                    boxShadow: '0 4px 12px rgba(0, 150, 136, 0.3)',
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgba(0, 150, 136, 0.4)',
+                      transform: 'translateY(-1px)'
+                    }
+                  }}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Login'}
+                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
                 </Button>
               </form>
             ) : (
@@ -141,46 +172,70 @@ export default function Login({ onLogin }) {
                   id="signup-name"
                   name="name"
                   label="Full Name"
+                  placeholder="Enter your full name"
                   margin="normal"
                   value={signupFormik.values.name}
                   onChange={signupFormik.handleChange}
                   error={signupFormik.touched.name && Boolean(signupFormik.errors.name)}
                   helperText={signupFormik.touched.name && signupFormik.errors.name}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
                 <TextField
                   fullWidth
                   id="signup-email"
                   name="email"
-                  label="Email"
+                  label="Email Address"
+                  placeholder="Enter your email address"
                   margin="normal"
                   value={signupFormik.values.email}
                   onChange={signupFormik.handleChange}
                   error={signupFormik.touched.email && Boolean(signupFormik.errors.email)}
                   helperText={signupFormik.touched.email && signupFormik.errors.email}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
                 <TextField
                   fullWidth
                   id="signup-password"
                   name="password"
                   label="Password"
+                  placeholder="Choose a secure password (min 6 characters)"
                   type="password"
                   margin="normal"
                   value={signupFormik.values.password}
                   onChange={signupFormik.handleChange}
                   error={signupFormik.touched.password && Boolean(signupFormik.errors.password)}
                   helperText={signupFormik.touched.password && signupFormik.errors.password}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
                 <TextField
                   fullWidth
                   id="signup-confirmPassword"
                   name="confirmPassword"
                   label="Confirm Password"
+                  placeholder="Re-enter your password"
                   type="password"
                   margin="normal"
                   value={signupFormik.values.confirmPassword}
                   onChange={signupFormik.handleChange}
                   error={signupFormik.touched.confirmPassword && Boolean(signupFormik.errors.confirmPassword)}
                   helperText={signupFormik.touched.confirmPassword && signupFormik.errors.confirmPassword}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
                 <Button
                   color="primary"
@@ -188,9 +243,22 @@ export default function Login({ onLogin }) {
                   fullWidth
                   type="submit"
                   disabled={loading}
-                  sx={{ mt: 3, py: 1.5 }}
+                  size="large"
+                  sx={{ 
+                    mt: 3, 
+                    py: 2,
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    textTransform: 'none',
+                    boxShadow: '0 4px 12px rgba(0, 150, 136, 0.3)',
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgba(0, 150, 136, 0.4)',
+                      transform: 'translateY(-1px)'
+                    }
+                  }}
                 >
-                  {loading ? <CircularProgress size={24} /> : 'Sign Up'}
+                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
                 </Button>
               </form>
             )}

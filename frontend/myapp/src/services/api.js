@@ -11,6 +11,40 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+const decodeToken = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return null;
+  }
+};
+
+const getCurrentUser = () => {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  
+  const decoded = decodeToken(token);
+  if (!decoded) return null;
+  
+  if (decoded.exp * 1000 < Date.now()) {
+    localStorage.removeItem('token');
+    return null;
+  }
+  
+  return decoded;
+};
+
+const isAdmin = () => {
+  const user = getCurrentUser();
+  return user && user.role === 'admin';
+};
+
 export const authService = {
   register: async (userData) => {
     const response = await axios.post(`${API_URL}/auth/register`, userData);
@@ -27,9 +61,14 @@ export const authService = {
     }
     return response.data;
   },
+  
   logout: () => {
     localStorage.removeItem('token');
-  }
+  },
+  
+  getCurrentUser,
+  isAdmin,
+  decodeToken
 };
 
 export const itemsService = {

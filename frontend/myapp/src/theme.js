@@ -96,18 +96,47 @@ const getTheme = (mode) => createTheme({
     },
     MuiTextField: {
       defaultProps: {
-        variant: 'filled',
+        variant: 'outlined',
       },
       styleOverrides: {
         root: {
-          '& .MuiFilledInput-root': {
-            backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
-            '&:hover': {
-              backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 12,
+            backgroundColor: mode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.05)',
+            transition: 'all 0.3s ease',
+            '& fieldset': {
+              borderColor: mode === 'light' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.12)',
+              borderWidth: '2px',
             },
+            '&:hover fieldset': {
+              borderColor: mode === 'light' ? 'rgba(0, 150, 136, 0.5)' : 'rgba(77, 182, 172, 0.5)',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: mode === 'light' ? '#009688' : '#4db6ac',
+              borderWidth: '2px',
+            },
+            '&.Mui-error fieldset': {
+              borderColor: red.A400,
+            },
+          },
+          '& .MuiInputLabel-root': {
+            fontWeight: 500,
             '&.Mui-focused': {
-              backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+              fontWeight: 600,
             },
+          },
+          '& .MuiInputBase-input': {
+            padding: '14px 16px',
+            fontSize: '1rem',
+            '&::placeholder': {
+              opacity: 0.7,
+              fontStyle: 'italic',
+            },
+          },
+          '& .MuiFormHelperText-root': {
+            marginLeft: 4,
+            marginTop: 6,
+            fontSize: '0.875rem',
           },
         },
       },

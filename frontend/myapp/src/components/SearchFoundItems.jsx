@@ -43,19 +43,28 @@ export default function SearchFoundItems() {
         title="Search for Items"
         subtitle="Use the search bar below to find items that have been reported as found."
       />
-      <Paper sx={{ p: 3 }}>
+      <Paper sx={{ p: 4, maxWidth: 900, mx: 'auto', mt: 4, borderRadius: 3 }}>
         <Typography variant="h5" gutterBottom>
           Find a Found Item
         </Typography>
         
-        <Box component="form" onSubmit={handleSearch} sx={{ mb: 4 }}>
+        <Box component="form" onSubmit={handleSearch} sx={{ mb: 5 }}>
           <TextField
             fullWidth
-            label="Search by keywords, category, or location"
-            placeholder="e.g., red wallet, phone, library"
+            label="Search for Found Items"
+            placeholder="Try searching: 'blue backpack', 'iPhone library', 'red wallet cafeteria'"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 4,
+                fontSize: '1.1rem',
+                '& .MuiInputBase-input': {
+                  padding: '18px 16px',
+                },
+              },
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -64,6 +73,17 @@ export default function SearchFoundItems() {
                     type="submit"
                     disabled={loading || !query.trim()}
                     startIcon={<SearchIcon />}
+                    sx={{
+                      py: 1.5,
+                      px: 3,
+                      borderRadius: 3,
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      boxShadow: '0 4px 12px rgba(0, 150, 136, 0.3)',
+                      '&:hover': {
+                        boxShadow: '0 6px 16px rgba(0, 150, 136, 0.4)',
+                      }
+                    }}
                   >
                     Search
                   </Button>

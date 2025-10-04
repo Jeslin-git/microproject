@@ -10,12 +10,13 @@ def generate_passkey(length=8):
     alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-def create_token(user_id: str) -> str:
+def create_token(user_id: str, role: str = 'student') -> str:
     """Create a JWT token for authentication"""
     payload = {
         'exp': datetime.utcnow() + timedelta(days=1),
         'iat': datetime.utcnow(),
-        'sub': str(user_id)
+        'sub': str(user_id),
+        'role': role
     }
     return jwt.encode(
         payload,

@@ -107,12 +107,8 @@ export default function AdminDashboard() {
         title="Admin Dashboard"
         subtitle="Manage claims and view retrieval history from here."
       />
+      <h2>Claims Management</h2>
       <Paper sx={{ p: 3 }}>
-        <Tabs value={tab} onChange={(e, newValue) => setTab(newValue)} sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}>
-          <Tab label="Claims Management" />
-          <Tab label="Retrieval History" />
-        </Tabs>
-
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
             <CircularProgress />
