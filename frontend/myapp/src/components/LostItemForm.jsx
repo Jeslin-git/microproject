@@ -30,7 +30,8 @@ const validationSchema = yup.object({
   description: yup.string().required('Description is required'),
   category: yup.string().required('Category is required'),
   location: yup.string().required('Location is required'),
-  dateLost: yup.date().required('Date lost is required')
+  dateLost: yup.date().required('Date lost is required'),
+  serialNumber: yup.string()
 });
 
 export default function LostItemForm({ onSubmit }) {
@@ -40,7 +41,8 @@ export default function LostItemForm({ onSubmit }) {
       description: '',
       category: '',
       location: '',
-      dateLost: format(new Date(), 'yyyy-MM-dd')
+      dateLost: format(new Date(), 'yyyy-MM-dd'),
+      serialNumber: ''
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -149,6 +151,24 @@ export default function LostItemForm({ onSubmit }) {
                   onChange={formik.handleChange}
                   error={formik.touched.location && Boolean(formik.errors.location)}
                   helperText={formik.touched.location && formik.errors.location || "Be as specific as possible"}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  id="serialNumber"
+                  name="serialNumber"
+                  label="Serial Number / ID (Optional)"
+                  placeholder="e.g., iPhone IMEI, laptop serial, student ID, model number, license plate..."
+                  value={formik.values.serialNumber}
+                  onChange={formik.handleChange}
+                  error={formik.touched.serialNumber && Boolean(formik.errors.serialNumber)}
+                  helperText={formik.touched.serialNumber && formik.errors.serialNumber || "Any identifying numbers on your item - this greatly improves matching accuracy!"}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,

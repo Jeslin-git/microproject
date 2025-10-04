@@ -29,7 +29,7 @@ const validationSchema = yup.object({
   description: yup.string().required('Description is required'),
   category: yup.string().required('Category is required'),
   location: yup.string().required('Location is required'),
-  passkey: yup.string()
+  serialNumber: yup.string()
 });
 
 export default function FoundItemForm({ onSubmit }) {
@@ -39,7 +39,7 @@ export default function FoundItemForm({ onSubmit }) {
       description: '',
       category: '',
       location: '',
-      passkey: ''
+      serialNumber: ''
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -155,14 +155,19 @@ export default function FoundItemForm({ onSubmit }) {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  id="passkey"
-                  name="passkey"
-                  label="Passkey (Optional)"
-                  placeholder="Enter the passkey if you found one with the item (like a note or tag)"
-                  value={formik.values.passkey}
+                  id="serialNumber"
+                  name="serialNumber"
+                  label="Serial Number / ID (Optional)"
+                  placeholder="e.g., iPhone IMEI, laptop serial, student ID number, model number..."
+                  value={formik.values.serialNumber}
                   onChange={formik.handleChange}
-                  error={formik.touched.passkey && Boolean(formik.errors.passkey)}
-                  helperText={formik.touched.passkey && formik.errors.passkey || "If there's a passkey with the item, enter it here for instant matching"}
+                  error={formik.touched.serialNumber && Boolean(formik.errors.serialNumber)}
+                  helperText={formik.touched.serialNumber && formik.errors.serialNumber || "Enter any visible numbers/codes on the item - helps with instant matching!"}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
