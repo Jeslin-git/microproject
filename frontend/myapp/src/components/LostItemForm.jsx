@@ -45,11 +45,27 @@ export default function LostItemForm({ onSubmit }) {
       serialNumber: ''
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      onSubmit({
-        ...values,
-        date_lost: values.dateLost // Convert to backend format
-      });
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        await onSubmit({
+          ...values,
+          date_lost: values.dateLost // Convert to backend format
+        });
+        // Reset form after successful submission
+        resetForm({
+          values: {
+            title: '',
+            description: '',
+            category: '',
+            location: '',
+            dateLost: format(new Date(), 'yyyy-MM-dd'),
+            serialNumber: ''
+          }
+        });
+      } catch (error) {
+        console.error('Error submitting lost item:', error);
+        // Don't reset form if there's an error
+      }
     }
   });
 

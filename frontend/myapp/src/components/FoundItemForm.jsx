@@ -42,8 +42,23 @@ export default function FoundItemForm({ onSubmit }) {
       serialNumber: ''
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      onSubmit(values);
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        await onSubmit(values);
+        // Reset form after successful submission
+        resetForm({
+          values: {
+            title: '',
+            description: '',
+            category: '',
+            location: '',
+            serialNumber: ''
+          }
+        });
+      } catch (error) {
+        console.error('Error submitting found item:', error);
+        // Don't reset form if there's an error
+      }
     }
   });
 

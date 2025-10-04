@@ -107,14 +107,16 @@ function App() {
                 {lostItems.map((item) => (
                   <Box key={item.id}>
                     <ItemCard item={item} type="lost" />
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setSelectedLostItem(item)}
-                      sx={{ mt: 1, mb: 2 }}
-                    >
-                      View Potential Matches
-                    </Button>
+                    {item.status !== "found" && (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedLostItem(item)}
+                        sx={{ mt: 1, mb: 2 }}
+                      >
+                        View Potential Matches
+                      </Button>
+                    )}
                     {selectedLostItem?.id === item.id && (
                       <Box sx={{ mt: 2, mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
                         <ItemMatches 

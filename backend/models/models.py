@@ -26,7 +26,7 @@ class Student:
 class LostItem:
     @staticmethod
     def create(title: str, description: str, category: str, location: str, date_lost: datetime, 
-               student_id: str, passkey: str):
+               student_id: str, passkey: str, serial_number: str = None):
         item = {
             "title": title,
             "description": description,
@@ -35,6 +35,7 @@ class LostItem:
             "date_lost": date_lost,
             "student_id": ObjectId(student_id),
             "passkey": passkey,
+            "serial_number": serial_number,
             "status": "pending",
             "created_at": datetime.utcnow()
         }
@@ -60,10 +61,22 @@ class LostItem:
             {"score": {"$meta": "textScore"}}
         ).sort([("score", {"$meta": "textScore"})]).limit(limit)
 
+    @staticmethod
+    def find_by_serial_number(serial_number: str):
+        """Find lost items by exact serial number match."""
+        return mongo.db.lost_items.find({"serial_number": {"$regex": serial_number, "$options": "i"}})
+
+    @staticmethod
+    def update_status(item_id: str, status: str):
+        return mongo.db.lost_items.update_one(
+            {"_id": ObjectId(item_id)},
+            {"$set": {"status": status, "updated_at": datetime.utcnow()}}
+        )
+
 class FoundItem:
     @staticmethod
     def create(title: str, description: str, category: str, location: str, 
-               finder_id: str, passkey: str):
+               finder_id: str, passkey: str, serial_number: str = None):
         item = {
             "title": title,
             "description": description,
@@ -71,6 +84,7 @@ class FoundItem:
             "location": location,
             "finder_id": ObjectId(finder_id),
             "passkey": passkey,
+            "serial_number": serial_number,
             "status": "unclaimed",
             "created_at": datetime.utcnow()
         }
@@ -78,7 +92,10 @@ class FoundItem:
 
     @staticmethod
     def find_by_passkey(passkey: str):
-        return mongo.db.found_items.find_one({"passkey": passkey})
+        return mongo.db.found_items.find_one({
+            "passkey": passkey,
+            "status": {"$ne": "claimed"}  # Exclude claimed items
+        })
 
     @staticmethod
     def update_status(item_id: str, status: str):
@@ -89,11 +106,22 @@ class FoundItem:
 
     @staticmethod
     def search(query: str, limit: int = 20):
-        """Text search found items by query string."""
+        """Text search found items by query string, excluding claimed items."""
         return mongo.db.found_items.find(
-            {"$text": {"$search": query}},
+            {
+                "$text": {"$search": query},
+                "status": {"$ne": "claimed"}  # Exclude claimed items
+            },
             {"score": {"$meta": "textScore"}}
         ).sort([("score", {"$meta": "textScore"})]).limit(limit)
+
+    @staticmethod
+    def find_by_serial_number(serial_number: str):
+        """Find found items by exact serial number match, excluding claimed items."""
+        return mongo.db.found_items.find({
+            "serial_number": {"$regex": serial_number, "$options": "i"},
+            "status": {"$ne": "claimed"}  # Exclude claimed items
+        })
 
 class Claim:
     @staticmethod
@@ -122,24 +150,14 @@ class Claim:
     def find_by_id(claim_id: str):
         return mongo.db.claims.find_one({"_id": ObjectId(claim_id)})
 
-class Retrieval:
     @staticmethod
-    def create(claim_id: str, retrieved_by: str, notes: str = ""):
-        retrieval = {
-            "claim_id": ObjectId(claim_id),
-            "retrieved_by": ObjectId(retrieved_by),
-            "notes": notes,
-            "retrieved_at": datetime.utcnow()
-        }
-        return mongo.db.retrievals.insert_one(retrieval)
+    def find_existing_claim(found_item_id: str, student_id: str):
+        """Check if a user has already claimed this found item."""
+        return mongo.db.claims.find_one({
+            "found_item_id": ObjectId(found_item_id),
+            "student_id": ObjectId(student_id)
+        })
 
-    @staticmethod
-    def find_by_claim(claim_id: str):
-        return mongo.db.retrievals.find_one({"claim_id": ObjectId(claim_id)})
-
-    @staticmethod
-    def find_all(limit: int = 50):
-        return mongo.db.retrievals.find().sort("retrieved_at", -1).limit(limit)
 
 def ensure_indexes() -> None:
     """Create required MongoDB indexes if they do not exist."""
@@ -148,26 +166,33 @@ def ensure_indexes() -> None:
 
     # Lost items: passkey and text index with weights
     mongo.db.lost_items.create_index([("passkey", ASCENDING)], name="lost_passkey_idx")
+    mongo.db.lost_items.create_index([("serial_number", ASCENDING)], name="lost_serial_idx")
     mongo.db.lost_items.create_index(
-        [("title", TEXT), ("description", TEXT), ("category", TEXT), ("location", TEXT)],
+        [("title", TEXT), ("description", TEXT), ("category", TEXT), ("location", TEXT), ("serial_number", TEXT)],
         name="lost_items_text_index",
         default_language="english",
-        weights={"title": 10, "description": 5, "category": 3, "location": 2},
+        weights={"title": 10, "description": 5, "category": 3, "location": 2, "serial_number": 8},
     )
 
     # Found items: passkey and text index with weights
     mongo.db.found_items.create_index([("passkey", ASCENDING)], name="found_passkey_idx")
+    mongo.db.found_items.create_index([("serial_number", ASCENDING)], name="found_serial_idx")
     mongo.db.found_items.create_index(
-        [("title", TEXT), ("description", TEXT), ("category", TEXT), ("location", TEXT)],
+        [("title", TEXT), ("description", TEXT), ("category", TEXT), ("location", TEXT), ("serial_number", TEXT)],
         name="found_items_text_index",
         default_language="english",
-        weights={"title": 10, "description": 5, "category": 3, "location": 2},
+        weights={"title": 10, "description": 5, "category": 3, "location": 2, "serial_number": 8},
     )
 
     # Claims: common lookup indexes
     mongo.db.claims.create_index([("lost_item_id", ASCENDING)], name="claims_lost_idx")
     mongo.db.claims.create_index([("found_item_id", ASCENDING)], name="claims_found_idx")
     mongo.db.claims.create_index([("student_id", ASCENDING)], name="claims_student_idx")
+    # Compound index to prevent duplicate claims and improve lookup performance
+    mongo.db.claims.create_index([
+        ("found_item_id", ASCENDING), 
+        ("student_id", ASCENDING)
+    ], name="claims_found_student_idx")
 
     # Retrievals: claim lookup
-    mongo.db.retrievals.create_index([("claim_id", ASCENDING)], name="retrievals_claim_idx")
+    mongo.db.retrievals.create_index([("claim_id", ASCENDING)], name="retrievals_claim_idx")
