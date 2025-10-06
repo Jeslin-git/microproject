@@ -103,7 +103,7 @@ export default function FoundItemForm({ onSubmit }) {
                   helperText={formik.touched.description && formik.errors.description || "Help the owner identify their item"}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   id="category"
@@ -149,7 +149,7 @@ export default function FoundItemForm({ onSubmit }) {
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   id="location"

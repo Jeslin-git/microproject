@@ -87,6 +87,11 @@ export const itemsService = {
     return response.data;
   },
 
+  getFoundItems: async () => {
+    const response = await axios.get(`${API_URL}/found-items`);
+    return response.data;
+  },
+
   searchFoundItems: async (query, filters = {}) => {
     const params = new URLSearchParams({ q: query, ...filters });
     const response = await axios.get(`${API_URL}/found-items/search?${params}`);
@@ -134,9 +139,10 @@ export const adminService = {
     return response.data;
   },
 
-  createRetrieval: async (claimId, notes) => {
+  createRetrieval: async (claimId, retrievalLocation, notes) => {
     const response = await axios.post(`${API_URL}/admin/retrievals`, {
       claim_id: claimId,
+      retrieval_location: retrievalLocation,
       notes
     });
     return response.data;
@@ -144,6 +150,59 @@ export const adminService = {
 
   getRetrievals: async () => {
     const response = await axios.get(`${API_URL}/admin/retrievals`);
+    return response.data;
+  },
+
+  updateRetrieval: async (retrievalId, notes) => {
+    const response = await axios.patch(`${API_URL}/admin/retrievals/${retrievalId}`, {
+      notes
+    });
+    return response.data;
+  },
+
+  // User Management
+  getUsers: async () => {
+    const response = await axios.get(`${API_URL}/admin/users`);
+    return response.data;
+  },
+
+  updateUserRole: async (userId, role) => {
+    const response = await axios.patch(`${API_URL}/admin/users/${userId}/role`, {
+      role
+    });
+    return response.data;
+  },
+
+  deleteUser: async (userId) => {
+    const response = await axios.delete(`${API_URL}/admin/users/${userId}`);
+    return response.data;
+  },
+
+  // Item Management
+  getLostItems: async () => {
+    const response = await axios.get(`${API_URL}/admin/lost-items`);
+    return response.data;
+  },
+
+  getFoundItems: async () => {
+    const response = await axios.get(`${API_URL}/admin/found-items`);
+    return response.data;
+  },
+
+  deleteLostItem: async (itemId) => {
+    const response = await axios.delete(`${API_URL}/admin/lost-items/${itemId}`);
+    return response.data;
+  },
+
+  deleteFoundItem: async (itemId) => {
+    const response = await axios.delete(`${API_URL}/admin/found-items/${itemId}`);
+    return response.data;
+  }
+};
+
+export const retrievalService = {
+  getMyRetrievals: async () => {
+    const response = await axios.get(`${API_URL}/retrievals/my`);
     return response.data;
   }
 };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   TextField,
@@ -17,12 +17,33 @@ import Hero from './Hero';
 export default function SearchFoundItems() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    loadAllFoundItems();
+  }, []);
+
+  const loadAllFoundItems = async () => {
+    setLoading(true);
+    try {
+      const data = await itemsService.getFoundItems();
+      setResults(data);
+    } catch (error) {
+      console.error('Failed to load found items:', error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim()) {
+      loadAllFoundItems();
+      setSearched(false);
+      return;
+    }
 
     setLoading(true);
     setSearched(true);
@@ -99,10 +120,10 @@ export default function SearchFoundItems() {
           </Box>
         )}
 
-        {!loading && searched && (
+        {!loading && (
           <Box>
             <Typography variant="h6" gutterBottom>
-              {results.length} {results.length === 1 ? 'Result' : 'Results'}
+              {searched ? `${results.length} Search ${results.length === 1 ? 'Result' : 'Results'}` : `All Found Items (${results.length})`}
             </Typography>
             
             <Grid container spacing={3}>
@@ -115,7 +136,7 @@ export default function SearchFoundItems() {
 
             {results.length === 0 && (
               <Typography variant="body1" color="text.secondary" align="center" sx={{ mt: 4 }}>
-                No items found matching your search criteria.
+                {searched ? 'No items found matching your search criteria.' : 'No found items available at the moment.'}
               </Typography>
             )}
           </Box>

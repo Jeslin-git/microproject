@@ -7,6 +7,7 @@ import {
   Report as ReportIcon,
   Search as SearchIcon,
   AdminPanelSettings as AdminPanelSettingsIcon,
+  Inventory as InventoryIcon,
 } from '@mui/icons-material';
 import { authService } from '../services/api';
 
@@ -31,6 +32,7 @@ const menuItems = [
   { text: 'Report Lost', icon: <ReportIcon />, path: '/lost' },
   { text: 'Report Found', icon: <FindInPageIcon />, path: '/found' },
   { text: 'Search Items', icon: <SearchIcon />, path: '/search' },
+  { text: 'My Items', icon: <InventoryIcon />, path: '/retrievals' },
   { text: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' },
 ];
 

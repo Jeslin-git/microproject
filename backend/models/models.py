@@ -98,6 +98,15 @@ class FoundItem:
         })
 
     @staticmethod
+    def find_by_id(item_id: str):
+        return mongo.db.found_items.find_one({"_id": ObjectId(item_id)})
+
+    @staticmethod
+    def find_all():
+        """Find all found items."""
+        return mongo.db.found_items.find().sort("created_at", -1)
+
+    @staticmethod
     def update_status(item_id: str, status: str):
         return mongo.db.found_items.update_one(
             {"_id": ObjectId(item_id)},
@@ -157,6 +166,49 @@ class Claim:
             "found_item_id": ObjectId(found_item_id),
             "student_id": ObjectId(student_id)
         })
+
+class Retrieval:
+    @staticmethod
+    def create(claim_id: str, student_id: str, admin_id: str, retrieval_location: str, notes: str = None):
+        """Create a retrieval record when a physical item is picked up."""
+        retrieval = {
+            "claim_id": ObjectId(claim_id),
+            "student_id": ObjectId(student_id),
+            "admin_id": ObjectId(admin_id),
+            "retrieval_location": retrieval_location,
+            "notes": notes,
+            "retrieval_date": datetime.utcnow(),
+            "created_at": datetime.utcnow()
+        }
+        return mongo.db.retrievals.insert_one(retrieval)
+
+    @staticmethod
+    def find_by_claim_id(claim_id: str):
+        """Find retrieval record by claim ID."""
+        return mongo.db.retrievals.find_one({"claim_id": ObjectId(claim_id)})
+
+    @staticmethod
+    def find_by_student(student_id: str):
+        """Find all retrievals by a student."""
+        return mongo.db.retrievals.find({"student_id": ObjectId(student_id)}).sort("retrieval_date", -1)
+
+    @staticmethod
+    def find_by_id(retrieval_id: str):
+        """Find retrieval by ID."""
+        return mongo.db.retrievals.find_one({"_id": ObjectId(retrieval_id)})
+
+    @staticmethod
+    def find_all(limit: int = 50):
+        """Find all retrievals."""
+        return mongo.db.retrievals.find().sort("retrieval_date", -1).limit(limit)
+
+    @staticmethod
+    def update_notes(retrieval_id: str, notes: str):
+        """Update retrieval notes."""
+        return mongo.db.retrievals.update_one(
+            {"_id": ObjectId(retrieval_id)},
+            {"$set": {"notes": notes, "updated_at": datetime.utcnow()}}
+        )
 
 
 def ensure_indexes() -> None:

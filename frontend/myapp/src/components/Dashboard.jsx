@@ -36,15 +36,18 @@ const Dashboard = ({ onLogout }) => {
       <Box sx={{ display: 'flex' }}>
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Toolbar>
-            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexGrow: 1 }} />
+            <Typography variant="h6" noWrap component="div" sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
               Lost & Found
             </Typography>
-            <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
-              {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-            <Button color="inherit" onClick={onLogout} startIcon={<LogoutIcon />}>
-              Logout
-            </Button>
+            <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+              <IconButton sx={{ ml: 1 }} onClick={toggleColorMode} color="inherit">
+                {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
+              <Button color="inherit" onClick={onLogout} startIcon={<LogoutIcon />}>
+                Logout
+              </Button>
+            </Box>
           </Toolbar>
         </AppBar>
         <Sidebar />

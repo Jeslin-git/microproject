@@ -110,7 +110,7 @@ export default function LostItemForm({ onSubmit }) {
                   helperText={formik.touched.description && formik.errors.description || "More details = better chance of finding your item"}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   id="category"
@@ -156,7 +156,7 @@ export default function LostItemForm({ onSubmit }) {
                   ))}
                 </TextField>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   id="location"
@@ -174,7 +174,7 @@ export default function LostItemForm({ onSubmit }) {
                   }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={8}>
                 <TextField
                   fullWidth
                   id="serialNumber"
@@ -192,7 +192,7 @@ export default function LostItemForm({ onSubmit }) {
                   }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
                   id="dateLost"
@@ -204,6 +204,11 @@ export default function LostItemForm({ onSubmit }) {
                   error={formik.touched.dateLost && Boolean(formik.errors.dateLost)}
                   helperText={formik.touched.dateLost && formik.errors.dateLost}
                   InputLabelProps={{ shrink: true }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    },
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
